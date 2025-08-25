@@ -7,8 +7,26 @@ const gameState = {
     letterStates: {}, // track state of each letter: 'unanswered', 'correct', 'wrong', 'passed'
     elapsedTime: 0,
     questionTimer: null,
-    mainTimer: null
+    mainTimer: null,
+    // Tracking for scoring
+    answeredCount: 0,
+    correctCount: 0,
+    wrongCount: 0,
+    passedCount: 0
 };
+
+// Scoring configuration
+const MAX_QUESTIONS = 15; // End after 15 total answers
+const T_MAX = 177;        // seconds
+const ALPHA = 0.9;        // weight on answer component
+
+function computeAccuracyScore(correct, wrong, elapsedSeconds) {
+    const Q = MAX_QUESTIONS;
+    const A = (correct - wrong + Q) / (2 * Q);
+    const S = 1 - Math.min(elapsedSeconds, T_MAX) / T_MAX;
+    const score01 = (ALPHA * A) + ((1 - ALPHA) * S);
+    return Math.max(0, Math.min(1, score01)) * 100;
+}
 
 // DOM Elements
 const mainBoard = document.getElementById('mainBoard');
@@ -33,6 +51,8 @@ function initializeGame() {
         letterBox.addEventListener('click', () => {
             if (!gameState.gameEnded && gameState.letterStates[letter] === 'unanswered') {
                 selectLetter(letter);
+            } else if (gameState.letterStates[letter] !== 'unanswered') {
+                triggerScreenShake();
             }
         });
         
@@ -53,6 +73,21 @@ function setupEventListeners() {
     stopwatch.addEventListener('click', endGame);
 }
 
+// Shake the whole screen to indicate invalid action (e.g., already-answered letter)
+function triggerScreenShake() {
+    const body = document.body;
+    if (!body) return;
+    if (body.classList.contains('shake')) {
+        body.classList.remove('shake');
+        // Force reflow to restart animation
+        void body.offsetWidth;
+    }
+    body.classList.add('shake');
+    const remove = () => body.classList.remove('shake');
+    body.addEventListener('animationend', remove, { once: true });
+    setTimeout(remove, 600);
+}
+
 // Handle keyboard input
 function handleKeyPress(event) {
     const key = event.key.toUpperCase();
@@ -68,6 +103,9 @@ function handleKeyPress(event) {
         // Check if game hasn't ended and letter is unanswered
         if (!gameState.gameEnded && gameState.letterStates[key] === 'unanswered') {
             selectLetter(key);
+        } else if (gameState.letterStates[key] !== 'unanswered') {
+            // Letter already answered -> shake screen
+            triggerScreenShake();
         }
     }
 }
@@ -150,6 +188,19 @@ function handleAnswer(result) {
     
     // Update letter state
     gameState.letterStates[gameState.currentLetter] = result;
+    // Update counters for scoring
+    switch (result) {
+        case 'correct':
+            gameState.correctCount++;
+            break;
+        case 'wrong':
+            gameState.wrongCount++;
+            break;
+        case 'passed':
+            gameState.passedCount++;
+            break;
+    }
+    gameState.answeredCount++;
     
     // Show appropriate feedback
     showFeedback(result);
@@ -196,6 +247,7 @@ function returnToMainBoard() {
     questionScreen.classList.remove('active');
     mainBoard.classList.add('active');
     gameState.currentLetter = null;
+    maybeEndGameIfDone();
 }
 
 // Update letter box appearance
@@ -226,6 +278,124 @@ function startMainTimer() {
     }, 1000);
 }
 
+function maybeEndGameIfDone() {
+    if (!gameState.gameEnded && gameState.answeredCount >= MAX_QUESTIONS) {
+        endGame();
+    }
+}
+
+function showResultsOverlay(correct, passed, wrong, accuracyPercent, elapsedSeconds) {
+    // Remove existing overlay if present
+    const existing = document.getElementById('resultsOverlay');
+    if (existing) existing.remove();
+    
+    const overlay = document.createElement('div');
+    overlay.id = 'resultsOverlay';
+    
+    const card = document.createElement('div');
+    card.className = 'results-card';
+    
+    const heading = document.createElement('div');
+    heading.className = 'result-heading';
+    heading.textContent = 'Final Results';
+
+    // Prominent percentage at the top (no label)
+    const accuracy = document.createElement('div');
+    accuracy.className = 'result-accuracy';
+    accuracy.innerHTML = '<div class="result-accuracy-value"></div>';
+    accuracy.querySelector('.result-accuracy-value').textContent = `${accuracyPercent.toFixed(1)}%`;
+
+    const breakdown = document.createElement('div');
+    breakdown.className = 'result-breakdown';
+    
+    const lineCorrect = document.createElement('div');
+    lineCorrect.className = 'result-line';
+    lineCorrect.innerHTML = '<span class="result-label">Correct:</span> <span class="result-value result-correct"></span>';
+    lineCorrect.querySelector('.result-value').textContent = correct;
+    
+    const linePass = document.createElement('div');
+    linePass.className = 'result-line';
+    linePass.innerHTML = '<span class="result-label">Passed:</span> <span class="result-value result-pass"></span>';
+    linePass.querySelector('.result-value').textContent = passed;
+    
+    const lineWrong = document.createElement('div');
+    lineWrong.className = 'result-line';
+    lineWrong.innerHTML = '<span class="result-label">Wrong:</span> <span class="result-value result-wrong"></span>';
+    lineWrong.querySelector('.result-value').textContent = wrong;
+
+    const lineTime = document.createElement('div');
+    lineTime.className = 'result-line';
+    const mm = Math.floor(elapsedSeconds / 60).toString().padStart(2, '0');
+    const ss = (elapsedSeconds % 60).toString().padStart(2, '0');
+    lineTime.innerHTML = '<span class="result-label">Time:</span> <span class="result-value result-time"></span>';
+    lineTime.querySelector('.result-time').textContent = `${mm}:${ss}`;
+    
+    breakdown.appendChild(lineCorrect);
+    breakdown.appendChild(linePass);
+    breakdown.appendChild(lineWrong);
+    breakdown.appendChild(lineTime);
+    
+    card.appendChild(heading);
+    card.appendChild(accuracy);
+    card.appendChild(breakdown);
+    overlay.appendChild(card);
+    document.body.appendChild(overlay);
+
+    // Prepare bouncing score card (DVD-style)
+    card.style.position = 'absolute';
+    card.style.willChange = 'transform';
+    card.style.zIndex = '2';
+    startDVDBounce(overlay, card);
+
+}
+
+function startDVDBounce(overlay, card) {
+    let x = 20;
+    let y = 20;
+    // Slower speeds to reduce stutter perception
+    let vx = 120; // px/sec
+    let vy = 90;  // px/sec
+    if (Math.random() < 0.5) vx = -vx;
+    if (Math.random() < 0.5) vy = -vy;
+    let last = performance.now();
+    // Measure card once to avoid per-frame layout reads
+    const cw = card.offsetWidth;
+    const ch = card.offsetHeight;
+
+    function step(now) {
+        let dt = (now - last) / 1000;
+        // Clamp delta to avoid big jumps when tab regains focus
+        if (dt > 0.05) dt = 0.05;
+        last = now;
+        // Use viewport size as overlay is fullscreen
+        const ow = window.innerWidth;
+        const oh = window.innerHeight;
+
+        x += vx * dt;
+        y += vy * dt;
+
+        if (x <= 0) { x = 0; vx = Math.abs(vx); }
+        else if (x + cw >= ow) { x = Math.max(0, ow - cw); vx = -Math.abs(vx); }
+
+        if (y <= 0) { y = 0; vy = Math.abs(vy); }
+        else if (y + ch >= oh) { y = Math.max(0, oh - ch); vy = -Math.abs(vy); }
+
+        card.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+        requestAnimationFrame(step);
+    }
+
+    requestAnimationFrame(() => {
+        const ow = window.innerWidth;
+        const oh = window.innerHeight;
+        x = Math.random() * Math.max(1, ow - cw);
+        y = Math.random() * Math.max(1, oh - ch);
+        last = performance.now();
+        requestAnimationFrame(step);
+    });
+}
+
+// (Confetti removed as requested)
+
 // Update stopwatch display
 function updateStopwatchDisplay() {
     const minutes = Math.floor(gameState.elapsedTime / 60);
@@ -255,6 +425,13 @@ function endGame() {
     if (questionScreen.classList.contains('active')) {
         returnToMainBoard();
     }
+    
+    // Compute and display final accuracy score with breakdown
+    const c = gameState.correctCount;
+    const p = gameState.passedCount;
+    const w = gameState.wrongCount;
+    const score = computeAccuracyScore(c, w, gameState.elapsedTime);
+    showResultsOverlay(c, p, w, score, gameState.elapsedTime);
     
     // Update UI to show game over state
     mainBoard.classList.add('game-over');
