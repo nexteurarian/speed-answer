@@ -1,107 +1,107 @@
 // Questions database - one for each letter A-Z
 const questions = {
     'A': {
-        question: "What fruit is known as 'the forbidden fruit' in the Bible?",
-        answer: "Apple"
+        question: "What do you call a comparison between two things to help explain an idea?",
+        answer: "Analogy"
     },
     'B': {
-        question: "What is the capital city of Germany?",
-        answer: "Berlin"
+        question: "Ringo Starr was the drummer for which famous band?",
+        answer: "The Beatles"
     },
     'C': {
-        question: "What element has the chemical symbol 'C'?",
-        answer: "Carbon"
+        question: "Who directed the 1997 blockbuster film \"Titanic\"?",
+        answer: "James Cameron"
     },
     'D': {
-        question: "What is the largest hot desert in the world?",
-        answer: "Sahara Desert"
+        question: "What is the name of the popular Italian dish made with layers of flat pasta, sauce, and cheese?",
+        answer: "Lasagna"
     },
     'E': {
-        question: "What is the most commonly used letter in the English language?",
-        answer: "E"
+        question: "What is the colored part of the human eye that controls the size of the pupil?",
+        answer: "Iris"
     },
     'F': {
-        question: "What country is home to the Eiffel Tower?",
-        answer: "France"
+        question: "A story that is not true and comes from the author's imagination is called what?",
+        answer: "Fiction"
     },
     'G': {
-        question: "What search engine was founded by Larry Page and Sergey Brin?",
-        answer: "Google"
+        question: "What is the force that pulls objects toward the center of the Earth?",
+        answer: "Gravity"
     },
     'H': {
-        question: "What is the chemical formula for water?",
-        answer: "H2O"
+        question: "What is the lightest and most common element in the universe?",
+        answer: "Hydrogen"
     },
     'I': {
-        question: "What country is shaped like a boot?",
-        answer: "Italy"
+        question: "What is the hard, outer layer of the Earth called?",
+        answer: "The Crust"
     },
     'J': {
-        question: "What is the largest planet in our solar system?",
-        answer: "Jupiter"
+        question: "What is the yellow, nutrient-rich part of the inside of an egg?",
+        answer: "Yolk"
     },
     'K': {
-        question: "What Australian animal is known for carrying its young in a pouch?",
-        answer: "Kangaroo"
+        question: "What is the title for the head teacher or leader of a school?",
+        answer: "Principal"
     },
     'L': {
-        question: "What is the capital of the United Kingdom?",
-        answer: "London"
+        question: "Who was the first person to walk on the moon?",
+        answer: "Neil Armstrong"
     },
     'M': {
-        question: "What is the Earth's natural satellite called?",
-        answer: "Moon"
+        question: "Which Filipino boxing icon is famously known by the nickname \"Pac-Man\"?",
+        answer: "Manny Pacquiao"
     },
     'N': {
-        question: "What element makes up 78% of the Earth's atmosphere?",
-        answer: "Nitrogen"
+        question: "Who sang the song \"drivers license,\" which was released in 2021?",
+        answer: "Olivia Rodrigo"
     },
     'O': {
+        question: "What is the name of the international multi-sport event held every four years in a different host city?",
+        answer: "The Olympic Games"
+    },
+    'P': {
+        question: "The invasion of which country by Germany in 1939 triggered the start of World War II?",
+        answer: "Poland"
+    },
+    'Q': {
+        question: "What is a short test used to check students’ understanding?",
+        answer: "Quiz"
+    },
+    'R': {
+        question: "What refers to an assessment that produces consistent and accurate results?",
+        answer: "Reliability"
+    },
+    'S': {
+        question: "How many continents are there in the world?",
+        answer: "Seven"
+    },
+    'T': {
+        question: "In the \"Harry Potter\" series, what is the name of the magical school the main characters attend?",
+        answer: "Hogwarts"
+    },
+    'U': {
+        question: "Who is the famous Jamaican sprinter, considered the fastest man in history?",
+        answer: "Usain Bolt"
+    },
+    'V': {
+        question: "Which Italian artist sculpted the statue of David?",
+        answer: "Michelangelo"
+    },
+    'W': {
+        question: "What does \"www\" stand for in a website address?",
+        answer: "World Wide Web"
+    },
+    'X': {
         question: "What is the largest ocean on Earth?",
         answer: "Pacific Ocean"
     },
-    'P': {
-        question: "What is the capital of France?",
-        answer: "Paris"
-    },
-    'Q': {
-        question: "Who is the current monarch of the United Kingdom?",
-        answer: "King Charles III"
-    },
-    'R': {
-        question: "What is the longest river in South America?",
-        answer: "Amazon River"
-    },
-    'S': {
-        question: "What is the closest star to Earth?",
-        answer: "The Sun"
-    },
-    'T': {
-        question: "What is the tallest building in the world as of 2024?",
-        answer: "Burj Khalifa"
-    },
-    'U': {
-        question: "What is the abbreviation for the United States of America?",
-        answer: "USA"
-    },
-    'V': {
-        question: "What planet is known as Earth's twin?",
-        answer: "Venus"
-    },
-    'W': {
-        question: "What is the largest mammal in the world?",
-        answer: "Blue Whale"
-    },
-    'X': {
-        question: "What type of electromagnetic radiation is used to see bones inside the body?",
-        answer: "X-rays"
-    },
     'Y': {
-        question: "What color is associated with cowardice?",
-        answer: "Yellow"
+        question: "What do you call a word that is spelled the same forwards and backwards, such as \"level\" or \"racecar\"?",
+        answer: "Palindrome"
     },
     'Z': {
-        question: "What is the smallest country in the world?",
-        answer: "Vatican City"
+        question: "In the Marvel Cinematic Universe, which superhero wields a hammer called Mjolnir?",
+        answer: "Thor"
     }
 };
